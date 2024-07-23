@@ -1,6 +1,6 @@
 const http = require('http');
 
-const users = require('./mocks/users')
+const UserController = require('./controllers/UserController');
 
 const server = http.createServer((request, response) => {
   console.log(`Request method: ${request.method} | Endpoint: ${request.url}`);
@@ -9,8 +9,7 @@ const server = http.createServer((request, response) => {
     response.writeHead(404, { 'Content-Type': 'text/html' });
     response.end(`Rota / funcionando`);
   } else if (request.url === '/users' && request.method === 'GET') {
-    response.writeHead(200, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify(users));
+    UserController.listUsers(request, response)
   } else {
     response.writeHead(404, { 'Content-Type': 'text/html' });
     response.end(`Cannot ${request.method} ${request.url}`);
