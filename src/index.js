@@ -1,30 +1,27 @@
 const http = require('http');
+const url = require('url');
 
 const routes = require('./routes');
 
 const server = http.createServer((request, response) => {
-  console.log(`Request method: ${request.method} | Endpoint: ${request.url}`);
+  const parsedUrl = url.parse(request.url, true);
 
+  console.log(`Request method: ${request.method} | Endpoint: ${parsedUrl.pathname}`);
+
+  // verificando se rota selecionado pelo usuário existe como endpoint
   const route = routes.find((routeObj) => (
-    routeObj.endpoint === request.url && routeObj.method === request.method
+    routeObj.endpoint === parsedUrl.pathname && routeObj.method === request.method
   ));
 
-  if (route) {
+  if (route) { // exibindo rota existente
+    request.query = parsedUrl.query;
+    
     route.handler(request, response);
-  } else {
+  } else { // exibindo mensagem 404 de rota não encontrada
     response.writeHead(404, { 'Content-Type': 'text/html' });
-    response.end(`Rota / funcionando`);
+    response.end(`Cannot ${request.method} ${parsedUrl.pathname}`);
   }
 
-  // if (request.url === '/' && request.method === 'GET') {
-
-  // } else if (request.url === '/users' && request.method === 'GET') {
-  //   UserController.listUsers(request, response)
-  // } else {
-  //   response.writeHead(404, { 'Content-Type': 'text/html' });
-  //   response.end(`Cannot ${request.method} ${request.url}`);
-  // }
-
 });
-
+// definindo porta do servidor
 server.listen(3000, () => console.log('Server started at http://localhost:3000'));
