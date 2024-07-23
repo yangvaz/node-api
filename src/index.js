@@ -1,10 +1,11 @@
 const http = require('http');
-const url = require('url');
+const { URL } = require('url');
 
 const routes = require('./routes');
 
 const server = http.createServer((request, response) => {
-  const parsedUrl = url.parse(request.url, true);
+  const parsedUrl = new URL(`http://localhost:3000${request.url}`);
+  console.log(parsedUrl)
 
   console.log(`Request method: ${request.method} | Endpoint: ${parsedUrl.pathname}`);
 
@@ -14,8 +15,8 @@ const server = http.createServer((request, response) => {
   ));
 
   if (route) { // exibindo rota existente
-    request.query = parsedUrl.query;
-    
+    // convertendo Iterable para Objeto
+    request.query = Object.fromEntries(parsedUrl.searchParams);
     route.handler(request, response);
   } else { // exibindo mensagem 404 de rota não encontrada
     response.writeHead(404, { 'Content-Type': 'text/html' });
